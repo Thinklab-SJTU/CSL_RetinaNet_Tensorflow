@@ -13,6 +13,7 @@
 | CSL | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 57.94 | - | H | **Triangle** | smooth L1 | **180** | 2x | × | 4X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v26.py |
 | CSL | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 64.50 | - | H | **Gaussian** | smooth L1 | **180** | 2x | × | 2X Quadro RTX 8000 | 1 | cfgs_res50_dota_v27.py |
 | CSL | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 65.09 | - | H | **Gaussian** | smooth L1 + **atan(theta)**  | **180** | 2x | × | 2X Quadro RTX 8000 | 1 | cfgs_res50_dota_v31.py |
+| CSL | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 65.44 | - | H | Gaussian | smooth L1 + atan(theta)  | 180 | 2x | × | 2X Quadro RTX 8000 | 1 | cfgs_res50_dota_v37.py |
 | CSL | ResNet152_v1 **MS** | DOTA1.0 trainval | DOTA1.0 test | 70.29 | [model](https://drive.google.com/file/d/1em9_GgRn0OdNel286gYJvF8R5e8sz9ed/view?usp=sharing) | H | **Gaussian** | smooth L1 + atan(theta)  | **180** | 2x | **√** | 2X Quadro RTX 8000 | 1 | cfgs_res152_dota_v36.py |
 
 ### CSL VS Baseline

@@ -80,20 +80,20 @@ class DetectionNetwork(object):
         return rpn_box_scores, rpn_box_probs
 
     def rpn_reg_net(self, inputs, scope_list, reuse_flag, level):
-        rpn_delta_boxes = inputs
+        rpn_conv2d_3x3 = inputs
         for i in range(4):
-            rpn_delta_boxes = slim.conv2d(inputs=rpn_delta_boxes,
-                                          num_outputs=256,
-                                          kernel_size=[3, 3],
-                                          weights_initializer=cfgs.SUBNETS_WEIGHTS_INITIALIZER,
-                                          biases_initializer=cfgs.SUBNETS_BIAS_INITIALIZER,
-                                          stride=1,
-                                          activation_fn=tf.nn.relu,
-                                          scope='{}_{}'.format(scope_list[1], i),
-                                          reuse=reuse_flag)
-        add_heatmap(rpn_delta_boxes, name='reg_head_%s' % level)
+            rpn_conv2d_3x3 = slim.conv2d(inputs=rpn_conv2d_3x3,
+                                         num_outputs=256,
+                                         kernel_size=[3, 3],
+                                         weights_initializer=cfgs.SUBNETS_WEIGHTS_INITIALIZER,
+                                         biases_initializer=cfgs.SUBNETS_BIAS_INITIALIZER,
+                                         stride=1,
+                                         activation_fn=tf.nn.relu,
+                                         scope='{}_{}'.format(scope_list[1], i),
+                                         reuse=reuse_flag)
+        add_heatmap(rpn_conv2d_3x3, name='reg_head_%s' % level)
 
-        rpn_delta_boxes = slim.conv2d(rpn_delta_boxes,
+        rpn_delta_boxes = slim.conv2d(rpn_conv2d_3x3,
                                       num_outputs=5 * self.num_anchors_per_location,
                                       kernel_size=[3, 3],
                                       stride=1,
@@ -103,7 +103,7 @@ class DetectionNetwork(object):
                                       activation_fn=None,
                                       reuse=reuse_flag)
 
-        rpn_angle_cls = slim.conv2d(rpn_delta_boxes,
+        rpn_angle_cls = slim.conv2d(rpn_delta_boxes,   # rpn_conv2d_3x3 in cfgs_res50_dota_v37.py
                                     num_outputs=cfgs.ANGLE_RANGE * self.num_anchors_per_location,
                                     kernel_size=[3, 3],
                                     stride=1,
