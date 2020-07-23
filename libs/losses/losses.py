@@ -66,7 +66,8 @@ def focal_loss(labels, pred, anchor_state, alpha=0.25, gamma=2.0):
 def angle_focal_loss(labels, pred, anchor_state, alpha=0.25, gamma=2.0):
 
     # filter out "ignore" anchors
-    indices = tf.reshape(tf.where(tf.not_equal(anchor_state, -1)), [-1, ])
+    # indices = tf.reshape(tf.where(tf.not_equal(anchor_state, -1)), [-1, ])
+    indices = tf.reshape(tf.where(tf.equal(anchor_state, 1)), [-1, ])
     labels = tf.gather(labels, indices)
     pred = tf.gather(pred, indices)
 
@@ -88,7 +89,8 @@ def angle_focal_loss(labels, pred, anchor_state, alpha=0.25, gamma=2.0):
                                 per_entry_cross_ent)
 
     # compute the normalizer: the number of positive anchors
-    normalizer = tf.stop_gradient(tf.where(tf.greater(anchor_state, -2)))
+    # normalizer = tf.stop_gradient(tf.where(tf.greater(anchor_state, -2)))
+    normalizer = tf.stop_gradient(tf.where(tf.equal(anchor_state, 1)))
     normalizer = tf.cast(tf.shape(normalizer)[0], tf.float32)
     normalizer = tf.maximum(1.0, normalizer)
 

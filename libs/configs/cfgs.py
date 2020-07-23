@@ -5,29 +5,30 @@ import tensorflow as tf
 import math
 
 """
-v27 + data aug. + MS + atan
+v31 +  fix angle cls. bug (line 106 in build_whole_network.py)
 This is your result for task 1:
 
-    mAP: 0.7028884684751898
-    ap of each class: plane:0.8667564161146087,
-    baseball-diamond:0.8253459467920615,
-    bridge:0.4897846778195108,
-    ground-track-field:0.747228457008536,
-    small-vehicle:0.6405610641223431,
-    large-vehicle:0.49705671204943547,
-    ship:0.6335849234698555,
-    tennis-court:0.893144800266831,
-    basketball-court:0.8626350724764835,
-    storage-tank:0.8609387992114981,
-    soccer-ball-field:0.6694961012635908,
-    roundabout:0.6346595227564863,
-    harbor:0.6509623790910654,
-    swimming-pool:0.6949999394263442,
-    helicopter:0.5761722152591966
+    mAP: 0.6543588107658855
+    ap of each class:
+    plane:0.88698521443448,
+    baseball-diamond:0.7501528150879597,
+    bridge:0.4239873364064931,
+    ground-track-field:0.644248754051753,
+    small-vehicle:0.6084107992551275,
+    large-vehicle:0.520710361858383,
+    ship:0.6543472784253033,
+    tennis-court:0.9086048469315559,
+    basketball-court:0.7888374114156529,
+    storage-tank:0.7537908561689395,
+    soccer-ball-field:0.5301397061108213,
+    roundabout:0.6209589882700127,
+    harbor:0.5524852026565777,
+    swimming-pool:0.6527527707421167,
+    helicopter:0.5189698196731068
 
 The submitted information is :
 
-Description: RetinaNet_DOTA_4x_20200202_162w
+Description: RetinaNet_DOTA_2x_20200330102.6w
 Username: SJTU-Det
 Institute: SJTU
 Emailadress: yangxue-2019-sjtu@sjtu.edu.cn
@@ -36,19 +37,19 @@ TeamMembers: yangxue
 """
 
 # ------------------------------------------------
-VERSION = 'RetinaNet_DOTA_4x_20200202'
-NET_NAME = 'resnet152_v1d'  # 'MobilenetV2'
+VERSION = 'RetinaNet_DOTA_2x_20200330'
+NET_NAME = 'resnet50_v1d'  # 'MobilenetV2'
 ADD_BOX_IN_TENSORBOARD = True
 
 # ---------------------------------------- System_config
 ROOT_PATH = os.path.abspath('../')
 print(20*"++--")
 print(ROOT_PATH)
-GPU_GROUP = "0,1"
+GPU_GROUP = "0,1,2,3"
 NUM_GPU = len(GPU_GROUP.strip().split(','))
 SHOW_TRAIN_INFO_INTE = 20
 SMRY_ITER = 200
-SAVE_WEIGHTS_INTE = 27000 * 4
+SAVE_WEIGHTS_INTE = 27000 * 2
 SUMMARY_PATH = ROOT_PATH + '/output/summary'
 TEST_SAVE_PATH = ROOT_PATH + '/tools/test_result'
 
@@ -90,17 +91,18 @@ DATASET_NAME = 'DOTA'  # 'pascal', 'coco'
 PIXEL_MEAN = [123.68, 116.779, 103.939]  # R, G, B. In tf, channel is RGB. In openCV, channel is BGR
 PIXEL_MEAN_ = [0.485, 0.456, 0.406]
 PIXEL_STD = [0.229, 0.224, 0.225]  # R, G, B. In tf, channel is RGB. In openCV, channel is BGR
-IMG_SHORT_SIDE_LEN = [720, 400, 600, 800, 1000, 1100, 1200]
-IMG_MAX_LENGTH = 1200
+IMG_SHORT_SIDE_LEN = 800
+IMG_MAX_LENGTH = 800
 CLASS_NUM = 15
 LABEL_TYPE = 0
 RADUIUS = 6
+OMEGA = 1
 
-IMG_ROTATE = True
-RGB2GRAY = True
-VERTICAL_FLIP = True
+IMG_ROTATE = False
+RGB2GRAY = False
+VERTICAL_FLIP = False
 HORIZONTAL_FLIP = True
-IMAGE_PYRAMID = True
+IMAGE_PYRAMID = False
 
 # --------------------------------------------- Network_config
 SUBNETS_WEIGHTS_INITIALIZER = tf.random_normal_initializer(mean=0.0, stddev=0.01, seed=None)
@@ -115,7 +117,7 @@ LEVEL = ['P3', 'P4', 'P5', 'P6', 'P7']
 BASE_ANCHOR_SIZE_LIST = [32, 64, 128, 256, 512]
 ANCHOR_STRIDE = [8, 16, 32, 64, 128]
 ANCHOR_SCALES = [2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]
-ANCHOR_RATIOS = [0.5, 1., 2.0, 1/4.0, 4.0, 1/6.0, 6.0]
+ANCHOR_RATIOS = [1, 1 / 2, 2., 1 / 3., 3., 5., 1 / 5.]
 ANCHOR_ANGLES = [-90, -75, -60, -45, -30, -15]
 ANCHOR_SCALE_FACTORS = None
 USE_CENTER_OFFSET = True

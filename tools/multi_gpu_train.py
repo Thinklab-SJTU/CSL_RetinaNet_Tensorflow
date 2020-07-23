@@ -211,16 +211,15 @@ def train():
 
                                     gt_smooth_label = tf.py_func(angle_smooth_label,
                                                                  inp=[gtboxes_and_label_r_[:, -2], cfgs.ANGLE_RANGE,
-                                                                      cfgs.LABEL_TYPE, cfgs.RADUIUS],
+                                                                      cfgs.LABEL_TYPE, cfgs.RADUIUS, cfgs.OMEGA],
                                                                  Tout=tf.float32)
-                                    gt_smooth_label = tf.reshape(gt_smooth_label, [-1, cfgs.ANGLE_RANGE])
                                 else:
                                     gt_smooth_label = tf.py_func(angle_smooth_label,
                                                                  inp=[gtboxes_and_label_r[:, -2], cfgs.ANGLE_RANGE,
                                                                       cfgs.LABEL_TYPE],
                                                                  Tout=tf.float32)
 
-                                gt_smooth_label = tf.reshape(gt_smooth_label, [-1, cfgs.ANGLE_RANGE])
+                                gt_smooth_label = tf.reshape(gt_smooth_label, [-1, cfgs.ANGLE_RANGE // cfgs.OMEGA])
 
                                 img = inputs_list[i][0]
                                 img_shape = inputs_list[i][-2:]
