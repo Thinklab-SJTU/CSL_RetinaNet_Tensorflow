@@ -216,7 +216,7 @@ def train():
                                 else:
                                     gt_smooth_label = tf.py_func(angle_smooth_label,
                                                                  inp=[gtboxes_and_label_r[:, -2], cfgs.ANGLE_RANGE,
-                                                                      cfgs.LABEL_TYPE],
+                                                                      cfgs.LABEL_TYPE, cfgs.RADUIUS, cfgs.OMEGA],
                                                                  Tout=tf.float32)
 
                                 gt_smooth_label = tf.reshape(gt_smooth_label, [-1, cfgs.ANGLE_RANGE // cfgs.OMEGA])
