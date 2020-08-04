@@ -7,7 +7,32 @@ import math
 """
 gaussian label, omega=6
 
+This is your result for task 1:
 
+mAP: 0.6251804082959679
+ap of each class: plane:0.8788620522554762,
+baseball-diamond:0.7108527765896498,
+bridge:0.39326363063833736,
+ground-track-field:0.5983420562893361,
+small-vehicle:0.6164282912414312,
+large-vehicle:0.516536657230959,
+ship:0.6725772964964745,
+tennis-court:0.9082415824440556,
+basketball-court:0.7557320334025829,
+storage-tank:0.7563441062866568,
+soccer-ball-field:0.475666226892059,
+roundabout:0.5541213292307309,
+harbor:0.5095408687967674,
+swimming-pool:0.6332644710885142,
+helicopter:0.39793274555648517
+
+The submitted information is :
+
+Description: RetinaNet_DOTA_2x_20200719_70.2w
+Username: yangxue
+Institute: DetectionTeamUCAS
+Emailadress: yangxue16@mails.ucas.ac.cn
+TeamMembers: yangxue, yangjirui
 
 """
 

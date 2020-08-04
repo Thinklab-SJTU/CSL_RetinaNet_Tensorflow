@@ -1,6 +1,9 @@
-# Circular Smooth Label for Large Aspect Ratio Rotation Object Detection
+# Arbitrary-Oriented Object Detection with Circular Smooth Label
 
-## Performance
+## Performance（deprecated）
+
+**Due to the improvement of the code, the performance of this repo is gradually improving, so the experimental results in this file are for reference only.**
+
 ### Window Function
 | Model |    Backbone    |    Training data    |    Val data    |    mAP   | Model Link | Anchor | Label Mode | Reg. Loss| Angle Range | lr schd | Data Augmentation | GPU | Image/GPU | Configs |      
 |:------------:|:------------:|:------------:|:---------:|:-----------:|:----------:|:-----------:|:-----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|    

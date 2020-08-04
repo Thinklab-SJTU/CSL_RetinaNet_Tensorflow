@@ -118,6 +118,13 @@ def save_to_xml(save_path, im_height, im_width, objects_axis, label_name):
         y3.appendChild(doc.createTextNode(str((objects_axis[i][7]))))
         bndbox.appendChild(y3)
 
+        x_head = doc.createElement('x_head')
+        x_head.appendChild(doc.createTextNode(str((objects_axis[i][8]))))
+        bndbox.appendChild(x_head)
+        y_head = doc.createElement('y_head')
+        y_head.appendChild(doc.createTextNode(str((objects_axis[i][9]))))
+        bndbox.appendChild(y_head)
+
     f = open(save_path, 'w')
     f.write(doc.toprettyxml(indent=''))
     f.close()

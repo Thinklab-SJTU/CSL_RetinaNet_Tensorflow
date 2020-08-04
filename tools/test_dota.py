@@ -65,7 +65,7 @@ def worker(gpu_id, images, det_net, args, result_queue):
             print('restore model %d ...' % gpu_id)
 
         for img_path in images:
-            # if 'P2037' not in img_path:
+            # if 'P1925' not in img_path:
             #     continue
             img = cv2.imread(img_path)
 
@@ -221,6 +221,7 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
                                                                                 labels=detected_categories,
                                                                                 scores=detected_scores,
                                                                                 method=1,
+                                                                                head=np.ones_like(detected_scores) * -1,
                                                                                 in_graph=False)
             cv2.imwrite(draw_path, final_detections)
 

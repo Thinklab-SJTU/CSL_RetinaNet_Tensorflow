@@ -7,6 +7,8 @@ from __future__ import division
 import tensorflow as tf
 import numpy as np
 
+from libs.configs import cfgs
+
 
 def bbox_transform_inv(boxes, deltas, scale_factors=None):
     dx = deltas[:, 0]
@@ -80,6 +82,10 @@ def rbbox_transform_inv(boxes, deltas, scale_factors=None):
         dh /= scale_factors[3]
         dtheta /= scale_factors[4]
 
+    BBOX_XFORM_CLIP = tf.log(cfgs.IMG_SHORT_SIDE_LEN / 16.)
+    dw = tf.minimum(dw, BBOX_XFORM_CLIP)
+    dh = tf.minimum(dh, BBOX_XFORM_CLIP)
+
     pred_ctr_x = dx * boxes[:, 2] + boxes[:, 0]
     pred_ctr_y = dy * boxes[:, 3] + boxes[:, 1]
     pred_w = tf.exp(dw) * boxes[:, 2]
@@ -93,10 +99,11 @@ def rbbox_transform_inv(boxes, deltas, scale_factors=None):
 
 def rbbox_transform(ex_rois, gt_rois, scale_factors=None):
 
-    targets_dx = (gt_rois[:, 0] - ex_rois[:, 0]) / ex_rois[:, 2]
-    targets_dy = (gt_rois[:, 1] - ex_rois[:, 1]) / ex_rois[:, 3]
-    targets_dw = np.log(gt_rois[:, 2] / ex_rois[:, 2])
-    targets_dh = np.log(gt_rois[:, 3] / ex_rois[:, 3])
+    targets_dx = (gt_rois[:, 0] - ex_rois[:, 0]) / (ex_rois[:, 2] + 1)
+    targets_dy = (gt_rois[:, 1] - ex_rois[:, 1]) / (ex_rois[:, 3] + 1)
+
+    targets_dw = np.log(gt_rois[:, 2] / (ex_rois[:, 2] + 1))
+    targets_dh = np.log(gt_rois[:, 3] / (ex_rois[:, 3] + 1))
 
     targets_dtheta = (gt_rois[:, 4] - ex_rois[:, 4]) * np.pi / 180
 

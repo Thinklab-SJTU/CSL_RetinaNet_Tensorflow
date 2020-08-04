@@ -7,6 +7,34 @@ import math
 """
 pulse label, omega=10
 
+This is your result for task 1:
+
+mAP: 0.6484872572861959
+ap of each class:
+plane:0.8862264631354506,
+baseball-diamond:0.7442558303044539,
+bridge:0.40053477041485125,
+ground-track-field:0.6821924499510706,
+small-vehicle:0.6508965011481392,
+large-vehicle:0.5447985631664758,
+ship:0.6597812268732252,
+tennis-court:0.9086874663797743,
+basketball-court:0.8078329580109678,
+storage-tank:0.796378115641156,
+soccer-ball-field:0.4450814153312123,
+roundabout:0.5976828141556162,
+harbor:0.5213612611383314,
+swimming-pool:0.5854884768357587,
+helicopter:0.4961105468064577
+
+The submitted information is :
+
+Description: RetinaNet_DOTA_2x_20200716_70.2w
+Username: yangxue
+Institute: DetectionTeamUCAS
+Emailadress: yangxue16@mails.ucas.ac.cn
+TeamMembers: yangxue, yangjirui
+
 
 """
 

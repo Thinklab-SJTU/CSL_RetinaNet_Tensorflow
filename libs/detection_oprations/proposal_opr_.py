@@ -45,7 +45,7 @@ def postprocess_detctions(rpn_bbox_pred, rpn_cls_prob, rpn_angle_prob, anchors, 
 
         boxes_pred = tf.reshape(boxes_pred, [-1, 5])
         angle_cls = (tf.reshape(angle_cls, [-1, ]) * -1 - 0.5) * cfgs.OMEGA
-        # angle_cls = tf.Print(angle_cls, [angle_cls], 'angle_cls', summarize=50)
+
         x, y, w, h, theta = tf.unstack(boxes_pred, axis=1)
         boxes_pred_angle = tf.transpose(tf.stack([x, y, w, h, angle_cls]))
 

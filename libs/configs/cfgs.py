@@ -5,39 +5,41 @@ import tensorflow as tf
 import math
 
 """
-v31 +  fix angle cls. bug (line 106 in build_whole_network.py)
+gaussian label, omega=10
+
+
 This is your result for task 1:
 
-    mAP: 0.6543588107658855
-    ap of each class:
-    plane:0.88698521443448,
-    baseball-diamond:0.7501528150879597,
-    bridge:0.4239873364064931,
-    ground-track-field:0.644248754051753,
-    small-vehicle:0.6084107992551275,
-    large-vehicle:0.520710361858383,
-    ship:0.6543472784253033,
-    tennis-court:0.9086048469315559,
-    basketball-court:0.7888374114156529,
-    storage-tank:0.7537908561689395,
-    soccer-ball-field:0.5301397061108213,
-    roundabout:0.6209589882700127,
-    harbor:0.5524852026565777,
-    swimming-pool:0.6527527707421167,
-    helicopter:0.5189698196731068
+    mAP: 0.6646152951988321
+    ap of each class: plane:0.8913767723850412,
+    baseball-diamond:0.7824342787811432,
+    bridge:0.41451628278951164,
+    ground-track-field:0.6188443663208361,
+    small-vehicle:0.6308969363807232,
+    large-vehicle:0.5409427060802551,
+    ship:0.656320806373397,
+    tennis-court:0.9085376681920635,
+    basketball-court:0.7934010277040646,
+    storage-tank:0.7562658557516387,
+    soccer-ball-field:0.5325627310101363,
+    roundabout:0.5894601611841765,
+    harbor:0.5305415436509874,
+    swimming-pool:0.6934177404914867,
+    helicopter:0.6297105508870214
 
 The submitted information is :
 
-Description: RetinaNet_DOTA_2x_20200330102.6w
+Description: RetinaNet_DOTA_2x_20200729_75.6w
 Username: SJTU-Det
 Institute: SJTU
 Emailadress: yangxue-2019-sjtu@sjtu.edu.cn
 TeamMembers: yangxue
 
+
 """
 
 # ------------------------------------------------
-VERSION = 'RetinaNet_DOTA_2x_20200330'
+VERSION = 'RetinaNet_DOTA_2x_20200729'
 NET_NAME = 'resnet50_v1d'  # 'MobilenetV2'
 ADD_BOX_IN_TENSORBOARD = True
 
@@ -45,11 +47,12 @@ ADD_BOX_IN_TENSORBOARD = True
 ROOT_PATH = os.path.abspath('../')
 print(20*"++--")
 print(ROOT_PATH)
-GPU_GROUP = "0,1,2,3"
+GPU_GROUP = "0,1,2"
 NUM_GPU = len(GPU_GROUP.strip().split(','))
 SHOW_TRAIN_INFO_INTE = 20
 SMRY_ITER = 200
 SAVE_WEIGHTS_INTE = 27000 * 2
+
 SUMMARY_PATH = ROOT_PATH + '/output/summary'
 TEST_SAVE_PATH = ROOT_PATH + '/tools/test_result'
 
@@ -75,8 +78,8 @@ GRADIENT_CLIPPING_BY_NORM = 10.0  # if None, will not clip
 
 CLS_WEIGHT = 1.0
 REG_WEIGHT = 1.0
-ANGLE_WEIGHT = 0.5
-REG_LOSS_MODE = 1
+ANGLE_WEIGHT = 2.0
+REG_LOSS_MODE = None
 
 BATCH_SIZE = 1
 EPSILON = 1e-5
@@ -95,8 +98,8 @@ IMG_SHORT_SIDE_LEN = 800
 IMG_MAX_LENGTH = 800
 CLASS_NUM = 15
 LABEL_TYPE = 0
-RADUIUS = 6
-OMEGA = 1
+RADUIUS = 1
+OMEGA = 10
 
 IMG_ROTATE = False
 RGB2GRAY = False
@@ -123,7 +126,7 @@ ANCHOR_SCALE_FACTORS = None
 USE_CENTER_OFFSET = True
 METHOD = 'H'
 USE_ANGLE_COND = False
-ANGLE_RANGE = 180  # 180 or 90
+ANGLE_RANGE = 180  # 90 or 180
 
 # --------------------------------------------RPN config
 SHARE_NET = True

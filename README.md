@@ -9,21 +9,12 @@ This repo is based on [Focal Loss for Dense Object Detection](https://arxiv.org/
 ## Circular Smooth Label
 ![5](CSL.png)
 
-## Performance
+## Latest Performance
 More results and trained models are available in the [MODEL_ZOO.md](MODEL_ZOO.md).
 ### DOTA1.0 (Task1)
 | Model |    Backbone    |    Training data    |    Val data    |    mAP   | Model Link | Anchor | Label Mode | Reg. Loss| Angle Range | lr schd | Data Augmentation | GPU | Image/GPU | Configs |      
 |:------------:|:------------:|:------------:|:---------:|:-----------:|:----------:|:-----------:|:-----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|    
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 39.52 | - | H | **Pulse** | smooth L1 | 90 | 1x | × | 1X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v20.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 58.86 | - | H | **Rectangular** | smooth L1 | 90 | 1x | × | 1X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v21.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 60.15 | - | H | **Triangle** | smooth L1 | 90 | 1x | × | 1X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v22.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 63.51 | - | H | **Gaussian** | smooth L1 | 90 | 2x | × | 2X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v18.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 42.06 | - | H | **Pulse** | smooth L1 | **180** | 2x | × | 4X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v28.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 61.98 | - | H | **Rectangular** | smooth L1 | **180** | 2x | × | 2X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v23.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 57.94 | - | H | **Triangle** | smooth L1 | **180** | 2x | × | 4X GeForce RTX 2080 Ti | 1 | cfgs_res50_dota_v26.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 64.50 | - | H | **Gaussian** | smooth L1 | **180** | 2x | × | 2X Quadro RTX 8000 | 1 | cfgs_res50_dota_v27.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 65.09 | - | H | **Gaussian** | smooth L1 + **atan(theta)**  | **180** | 2x | × | 2X Quadro RTX 8000 | 1 | cfgs_res50_dota_v31.py |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet152_v1 **MS** | DOTA1.0 trainval | DOTA1.0 test | 70.29 | [model](https://drive.google.com/file/d/1em9_GgRn0OdNel286gYJvF8R5e8sz9ed/view?usp=sharing) | H | **Gaussian** | smooth L1 + atan(theta)  | **180** | 2x | **√** | 2X Quadro RTX 8000 | 1 | cfgs_res152_dota_v36.py |
+| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 66.46 | - | H | **Gaussian (r=1, w=10)** | smooth L1 | **180** | 2x | × | 3X GeForce RTX 2080 Ti | 1 | [cfgs_res50_dota_v45.py](./libs/configs/DOTA1.0/CSL/cfgs_res50_dota_v45.py) |
 
 ### Visualization
 ![1](demo1.png)
@@ -111,17 +102,19 @@ If this is useful for your research, please consider cite.
 @article{yang2020arbitrary,
     title={Arbitrary-Oriented Object Detection with Circular Smooth Label},
     author={Yang, Xue and Yan, Junchi},
-    journal={arXiv preprint arXiv:2003.05597},
+    journal={European Conference on Computer Vision (ECCV)},
     year={2020}
+    organization={Springer}
 }
 
 @inproceedings{xia2018dota,
     title={DOTA: A large-scale dataset for object detection in aerial images},
     author={Xia, Gui-Song and Bai, Xiang and Ding, Jian and Zhu, Zhen and Belongie, Serge and Luo, Jiebo and Datcu, Mihai and Pelillo, Marcello and Zhang, Liangpei},
-    booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+    booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
     pages={3974--3983},
     year={2018}
 }
+
 ```
 
 

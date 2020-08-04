@@ -9,15 +9,15 @@ pulse label, omega=6
 
 This is your result for task 1:
 
-mAP: 0.3755331785299197
-ap of each class: plane:0.8755673823595682, baseball-diamond:0.7673203462639046, bridge:0.13273962192457492, ground-track-field:0.3078550219900431, small-vehicle:0.24827128309065874, large-vehicle:0.0482029971926881, ship:0.12667758720640454, tennis-court:0.4421513550793676, basketball-court:0.22160952317331487, storage-tank:0.7347215994372591, soccer-ball-field:0.2903134845995513, roundabout:0.5992290078289693, harbor:0.16347172997999027, swimming-pool:0.34127386834446516, helicopter:0.33359286947803696
+mAP: 0.6435129591845706
+ap of each class: plane:0.8903764082870609, baseball-diamond:0.7645236494609533, bridge:0.38332101219216147, ground-track-field:0.6260166671590793, small-vehicle:0.5891393628359463, large-vehicle:0.5316438530871476, ship:0.6633491228799488, tennis-court:0.9085529854760626, basketball-court:0.7695608741910873, storage-tank:0.7563412029560757, soccer-ball-field:0.5253605802038528, roundabout:0.5413579303740202, harbor:0.5094120177017716, swimming-pool:0.6633094237905023, helicopter:0.5304292971728879
 The submitted information is :
 
-Description: RetinaNet_DOTA_2x_20200718
-Username: yangxue
-Institute: DetectionTeamUCAS
-Emailadress: yangxue16@mails.ucas.ac.cn
-TeamMembers: yangxue, yangjirui
+Description: RetinaNet_DOTA_2x_20200718_70.2w
+Username: SJTU-Det
+Institute: SJTU
+Emailadress: yangxue-2019-sjtu@sjtu.edu.cn
+TeamMembers: yangxue
 
 """
 
@@ -109,7 +109,7 @@ ANCHOR_SCALE_FACTORS = None
 USE_CENTER_OFFSET = True
 METHOD = 'H'
 USE_ANGLE_COND = False
-ANGLE_RANGE = 190  # 90 or 180
+ANGLE_RANGE = 180  # 90 or 180
 
 # --------------------------------------------RPN config
 SHARE_NET = True

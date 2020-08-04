@@ -10,13 +10,13 @@ import cv2
 from libs.label_name_dict.label_dict import *
 from help_utils.tools import *
 
-tf.app.flags.DEFINE_string('VOC_dir', '/data/yangxue/dataset/MLT/train/', 'Voc dir')
-tf.app.flags.DEFINE_string('xml_dir', 'xmls', 'xml dir')
+tf.app.flags.DEFINE_string('VOC_dir', '/data/yangxue/dataset/RS-SJTU/crop/trainval', 'Voc dir')
+tf.app.flags.DEFINE_string('xml_dir', 'labelxml', 'xml dir')
 tf.app.flags.DEFINE_string('image_dir', 'images', 'image dir')
 tf.app.flags.DEFINE_string('save_name', 'train', 'save name')
 tf.app.flags.DEFINE_string('save_dir', '../tfrecord/', 'save name')
 tf.app.flags.DEFINE_string('img_format', '.jpg', 'format of image')
-tf.app.flags.DEFINE_string('dataset', 'MLT', 'dataset')
+tf.app.flags.DEFINE_string('dataset', 'RS-SJTU', 'dataset')
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -60,7 +60,7 @@ def read_xml_gtbox_and_label(xml_path):
                 if child_item.tag == 'bndbox':
                     tmp_box = []
                     for node in child_item:
-                        tmp_box.append(int(node.text))
+                        tmp_box.append(float(node.text))
                     assert label is not None, 'label is none, error'
                     tmp_box.append(label)
                     box_list.append(tmp_box)
@@ -91,6 +91,7 @@ def convert_pascal_to_tfrecord():
             continue
 
         img_height, img_width, gtbox_label = read_xml_gtbox_and_label(xml)
+
         # if img_height != 600 or img_width != 600:
         #     continue
 

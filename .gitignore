@@ -115,6 +115,13 @@ __pycache__/
 *.ckpt
 *.pb
 *.tfrecord*
+*RS-SJTU*
+*head*
+*HEAD*
+*.DS_Store*
+*RS-SJTU*
+*eval_devkit*
+*vanilla_csl*
 
 tools/demos/*
 tools/test_dota/*

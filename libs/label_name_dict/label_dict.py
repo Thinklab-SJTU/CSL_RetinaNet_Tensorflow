@@ -62,6 +62,12 @@ elif cfgs.DATASET_NAME == 'ICDAR2015':
         'back_ground': 0,
         'text': 1
     }
+elif cfgs.DATASET_NAME.startswith('RS-SJTU'):
+    NAME_LABEL_MAP = {
+        'back_ground': 0,
+        'ship': 1,
+        'airplane': 2
+    }
 elif cfgs.DATASET_NAME.startswith('MLT'):
     NAME_LABEL_MAP = {
         'back_ground': 0,

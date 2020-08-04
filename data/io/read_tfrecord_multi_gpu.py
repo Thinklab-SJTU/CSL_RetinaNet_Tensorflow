@@ -94,12 +94,12 @@ def next_batch(dataset_name, batch_size, shortside_len, is_training):
     # assert batch_size == 1, "we only support batch_size is 1.We may support large batch_size in the future"
 
     valid_dataset= ['DOTA1.5', 'ICDAR2015', 'pascal', 'coco', 'bdd100k', 'DOTA', 'DOTA800',
-                    'DOTA1024',  'HRSC2016', 'UCAS-AOD', 'MLT']
+                    'DOTA1024',  'HRSC2016', 'UCAS-AOD', 'MLT', 'RS-SJTU']
     if dataset_name not in valid_dataset:
         raise ValueError('dataSet name must be in {}'.format(valid_dataset))
 
     if is_training:
-        pattern = os.path.join('../data/tfrecord', dataset_name + '*_train*')
+        pattern = os.path.join('../data/tfrecord', dataset_name + '_train*')
     else:
         pattern = os.path.join('../data/tfrecord', dataset_name + '_test*')
 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                    batch_size=cfgs.BATCH_SIZE * 8,
                    shortside_len=cfgs.IMG_SHORT_SIDE_LEN,
                    is_training=True)
-    gtboxes_and_label = tf.reshape(gtboxes_and_label_batch, [-1, 9])
+    # gtboxes_and_label = tf.reshape(gtboxes_and_label_batch, [-1, 9])
 
     init_op = tf.group(
         tf.global_variables_initializer(),
