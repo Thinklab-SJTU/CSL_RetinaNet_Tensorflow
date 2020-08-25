@@ -9,7 +9,7 @@ import os
 import sys
 sys.path.append('../../')
 
-from data.io import image_preprocess_multi_gpu_head as image_preprocess
+from data.io import image_preprocess_multi_gpu_ohdet as image_preprocess
 from libs.configs import cfgs
 
 
@@ -94,7 +94,7 @@ def next_batch(dataset_name, batch_size, shortside_len, is_training):
     # assert batch_size == 1, "we only support batch_size is 1.We may support large batch_size in the future"
 
     valid_dataset= ['DOTA1.5', 'ICDAR2015', 'pascal', 'coco', 'bdd100k', 'DOTA', 'DOTA800',
-                    'DOTA1024',  'HRSC2016', 'UCAS-AOD', 'MLT', 'RS-SJTU', 'RS-SJTU_HEAD', 'DOTA_HEAD']
+                    'DOTA1024',  'HRSC2016', 'UCAS-AOD', 'MLT', 'OHD-SJTU', 'RS-SJTU_HEAD', 'DOTA_HEAD']
     if dataset_name not in valid_dataset:
         raise ValueError('dataSet name must be in {}'.format(valid_dataset))
 

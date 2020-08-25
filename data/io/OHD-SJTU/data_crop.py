@@ -218,11 +218,11 @@ def clip_image(file_idx, image, boxes_all, width, height, stride_w, stride_h):
 
 
 print('class_list', len(class_list))
-raw_data = '/data/yangxue/dataset/RS-SJTU/trainval/'
+raw_data = '/data/yangxue/dataset/OHD-SJTU/trainval/'
 raw_images_dir = os.path.join(raw_data, 'images')
 raw_label_dir = os.path.join(raw_data, 'rotation_txt')
 
-save_dir = '/data/yangxue/dataset/RS-SJTU/crop/trainval/'
+save_dir = '/data/yangxue/dataset/OHD-SJTU/crop/trainval/'
 
 images = [i for i in os.listdir(raw_images_dir) if 'jpg' in i]
 labels = [i for i in os.listdir(raw_label_dir) if 'txt' in i]

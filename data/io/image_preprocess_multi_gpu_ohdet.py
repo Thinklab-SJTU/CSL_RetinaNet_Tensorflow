@@ -138,7 +138,7 @@ def flip_up_down(img_tensor, gtboxes_and_label):
     new_y4 = h - y4
     new_y_head = h - y_head
 
-    return img_tensor, tf.transpose(tf.stack([x1, new_y1, x2, new_y2, x3, new_y3, x4, new_y4, y4, new_y_head, label], axis=0))
+    return img_tensor, tf.transpose(tf.stack([x1, new_y1, x2, new_y2, x3, new_y3, x4, new_y4, x_head, new_y_head, label], axis=0))
 
 
 def random_flip_up_down(img_tensor, gtboxes_and_label):
@@ -196,7 +196,7 @@ def rotate_img_np(img, gtboxes_and_label, r_theta):
 
     new_points_list = []
     obj_num = len(gtboxes_and_label)
-    for st in range(0, 9, 2):
+    for st in range(0, 10, 2):
         points = gtboxes_and_label[:, st:st+2]
         expand_points = np.concatenate((points, np.ones(shape=(obj_num, 1))), axis=1)
         new_points = np.dot(M, expand_points.T)

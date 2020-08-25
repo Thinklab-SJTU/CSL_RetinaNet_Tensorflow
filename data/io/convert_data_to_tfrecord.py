@@ -10,13 +10,13 @@ import cv2
 from libs.label_name_dict.label_dict import *
 from help_utils.tools import *
 
-tf.app.flags.DEFINE_string('VOC_dir', '/data/yangxue/dataset/RS-SJTU/crop/trainval', 'Voc dir')
+tf.app.flags.DEFINE_string('VOC_dir', '/data/yangxue/dataset/OHD-SJTU/crop/trainval', 'Voc dir')
 tf.app.flags.DEFINE_string('xml_dir', 'labelxml', 'xml dir')
 tf.app.flags.DEFINE_string('image_dir', 'images', 'image dir')
 tf.app.flags.DEFINE_string('save_name', 'train', 'save name')
 tf.app.flags.DEFINE_string('save_dir', '../tfrecord/', 'save name')
 tf.app.flags.DEFINE_string('img_format', '.jpg', 'format of image')
-tf.app.flags.DEFINE_string('dataset', 'RS-SJTU', 'dataset')
+tf.app.flags.DEFINE_string('dataset', 'OHD-SJTU', 'dataset')
 FLAGS = tf.app.flags.FLAGS
 
 
