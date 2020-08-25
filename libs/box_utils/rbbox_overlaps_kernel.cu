@@ -154,6 +154,7 @@ __device__ inline bool inrect(float pt_x, float pt_y, float * pts) {
   adad = ad[0] * ad[0] + ad[1] * ad[1];
   adap = ad[0] * ap[0] + ad[1] * ap[1];
   bool result = (abab - abap >=  -1) and (abap >= -1) and (adad - adap >= -1) and (adap >= -1);
+  // bool result = (abab >= abap) and (abap >= 0) and (adad >= adap) and (adap >= 0);
   return result;
 }
 
@@ -171,7 +172,7 @@ __device__ inline int inter_pts(float * pts1, float * pts2, float * int_pts) {
       int_pts[num_of_inter * 2] = pts2[2 * i];
       int_pts[num_of_inter * 2 + 1] = pts2[2 * i + 1];
       num_of_inter++;
-    }   
+    }
   }
 
   float temp_pts[2];
@@ -186,7 +187,7 @@ __device__ inline int inter_pts(float * pts1, float * pts2, float * int_pts) {
       }
     }
   }
-  
+
 
   return num_of_inter;
 }
@@ -196,7 +197,7 @@ __device__ inline void convert_region(float * pts , float const * const region) 
   float angle = region[4];
   float a_cos = cos(angle/180.0*3.1415926535);
   float a_sin = sin(angle/180.0*3.1415926535);
-  
+
   float ctr_x = region[0];
   float ctr_y = region[1];
 
@@ -219,7 +220,7 @@ __device__ inline void convert_region(float * pts , float const * const region) 
   for(int i = 0;i < 4;i++) {
     pts[7 - 2 * i - 1] = a_cos * pts_x[i] - a_sin * pts_y[i] + ctr_x;
     pts[7 - 2 * i] = a_sin * pts_x[i] + a_cos * pts_y[i] + ctr_y;
-   
+
   }
 
 }
@@ -240,24 +241,28 @@ __device__ inline float inter(float const * const region1, float const * const r
   reorder_pts(int_pts, num_of_inter);
 
   return area(int_pts, num_of_inter);
-  
-  
+
+
 }
 
 __device__ inline float devRotateIoU(float const * const region1, float const * const region2) {
-  
+
   if((fabs(region1[0] - region2[0]) < 1e-5) && (fabs(region1[1] - region2[1]) < 1e-5) && (fabs(region1[2] - region2[2]) < 1e-5) && (fabs(region1[3] - region2[3]) < 1e-5) && (fabs(region1[4] - region2[4]) < 1e-5)) {
     return 1.0;
   }
-  
+
   float area1 = region1[2] * region1[3];
   float area2 = region2[2] * region2[3];
   float area_inter = inter(region1, region2);
-  
-  float result = area_inter / (area1 + area2 - area_inter);
 
-  if(result < 0) {
-    result = 0.0;
+  if (region1[2] < 0.1 | region1[3] < 0.1 | region2[2] < 0.1 | region2[3] < 0.1){
+    area_inter = 0;
+  }
+
+  float result = area_inter / (area1 + area2 - area_inter + 1e-6);
+
+  if(result < 0 | result > 1) {
+    result = 0;
   }
   return result;
   

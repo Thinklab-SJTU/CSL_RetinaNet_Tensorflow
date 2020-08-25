@@ -115,11 +115,10 @@ __pycache__/
 *.ckpt
 *.pb
 *.tfrecord*
-*RS-SJTU*
+*ohdet*
 *head*
-*HEAD*
 *.DS_Store*
-*RS-SJTU*
+*OHD-SJTU*
 *eval_devkit*
 *vanilla_csl*
 

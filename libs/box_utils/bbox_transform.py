@@ -82,9 +82,9 @@ def rbbox_transform_inv(boxes, deltas, scale_factors=None):
         dh /= scale_factors[3]
         dtheta /= scale_factors[4]
 
-    BBOX_XFORM_CLIP = tf.log(cfgs.IMG_SHORT_SIDE_LEN / 16.)
-    dw = tf.minimum(dw, BBOX_XFORM_CLIP)
-    dh = tf.minimum(dh, BBOX_XFORM_CLIP)
+    # BBOX_XFORM_CLIP = tf.log(cfgs.IMG_SHORT_SIDE_LEN / 16.)
+    # dw = tf.minimum(dw, BBOX_XFORM_CLIP)
+    # dh = tf.minimum(dh, BBOX_XFORM_CLIP)
 
     pred_ctr_x = dx * boxes[:, 2] + boxes[:, 0]
     pred_ctr_y = dy * boxes[:, 3] + boxes[:, 1]
