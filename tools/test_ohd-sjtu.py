@@ -140,10 +140,7 @@ def worker(gpu_id, images, det_net, args, result_queue):
             box_res_rotate_ = []
             label_res_rotate_ = []
             score_res_rotate_ = []
-            threshold = {'roundabout': 0.1, 'tennis-court': 0.3, 'swimming-pool': 0.1, 'storage-tank': 0.2,
-                         'soccer-ball-field': 0.3, 'small-vehicle': 0.2, 'ship': 0.2, 'plane': 0.3,
-                         'large-vehicle': 0.1, 'helicopter': 0.2, 'harbor': 0.0001, 'ground-track-field': 0.3,
-                         'bridge': 0.0001, 'basketball-court': 0.3, 'baseball-diamond': 0.3}
+            threshold = {'ship': 0.2, 'airplane': 0.3}
 
             for sub_class in range(1, cfgs.CLASS_NUM + 1):
                 index = np.where(label_res_rotate == sub_class)[0]
@@ -180,9 +177,9 @@ def worker(gpu_id, images, det_net, args, result_queue):
             result_queue.put_nowait(result_dict)
 
 
-def test_dota(det_net, real_test_img_list, args, txt_name):
+def test_ohd_sjtu(det_net, real_test_img_list, args, txt_name):
 
-    save_path = os.path.join('./test_dota', cfgs.VERSION)
+    save_path = os.path.join('./test_ohd_sjtu', cfgs.VERSION)
 
     nr_records = len(real_test_img_list)
     pbar = tqdm(total=nr_records)
@@ -207,8 +204,8 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
         if args.show_box:
 
             nake_name = res['image_id'].split('/')[-1]
-            tools.mkdir(os.path.join(save_path, 'dota_img_vis'))
-            draw_path = os.path.join(save_path, 'dota_img_vis', nake_name)
+            tools.mkdir(os.path.join(save_path, 'ohd_sjtu_img_vis'))
+            draw_path = os.path.join(save_path, 'ohd_sjtu_img_vis', nake_name)
 
             draw_img = np.array(cv2.imread(res['image_id']), np.float32)
             detected_boxes = backward_convert(res['boxes'], with_label=False)
@@ -228,14 +225,14 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
             cv2.imwrite(draw_path, final_detections)
 
         else:
-            CLASS_DOTA = NAME_LABEL_MAP.keys()
+            CLASS_OHD_SJTU = NAME_LABEL_MAP.keys()
             write_handle = {}
 
-            tools.mkdir(os.path.join(save_path, 'dota_res'))
-            for sub_class in CLASS_DOTA:
+            tools.mkdir(os.path.join(save_path, 'ohd-sjtu_res'))
+            for sub_class in CLASS_OHD_SJTU:
                 if sub_class == 'back_ground':
                     continue
-                write_handle[sub_class] = open(os.path.join(save_path, 'dota_res', 'Task1_%s.txt' % sub_class), 'a+')
+                write_handle[sub_class] = open(os.path.join(save_path, 'ohd-sjtu_res', 'Task1_%s.txt' % sub_class), 'a+')
 
             # rboxes = forward_convert(res['boxes'], with_label=False)
 
@@ -246,7 +243,7 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
                                                                                  rbox[4], rbox[5], rbox[6], rbox[7],)
                 write_handle[LABEL_NAME_MAP[res['labels'][i]]].write(command)
 
-            for sub_class in CLASS_DOTA:
+            for sub_class in CLASS_OHD_SJTU:
                 if sub_class == 'back_ground':
                     continue
                 write_handle[sub_class].close()
@@ -295,7 +292,7 @@ def eval(num_imgs, args):
 
     csl = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
                                                is_training=False)
-    test_dota(det_net=csl, real_test_img_list=real_test_img_list, args=args, txt_name=txt_name)
+    test_ohd_sjtu(det_net=csl, real_test_img_list=real_test_img_list, args=args, txt_name=txt_name)
 
     if not args.show_box:
         os.remove(txt_name)
@@ -303,11 +300,11 @@ def eval(num_imgs, args):
 
 def parse_args():
 
-    parser = argparse.ArgumentParser('evaluate the result with Pascal2007 strand')
+    parser = argparse.ArgumentParser('evaluate the result with DOTA strand')
 
     parser.add_argument('--test_dir', dest='test_dir',
                         help='evaluate imgs dir ',
-                        default='/data/DOTA/test/images/', type=str)
+                        default='/data/yangxue/dataset/OHD-SJTU/test/images', type=str)
     parser.add_argument('--gpus', dest='gpus',
                         help='gpu id',
                         default='0,1,2,3,4,5,6,7', type=str)
@@ -320,16 +317,16 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--h_len', dest='h_len',
                         help='image height',
-                        default=600, type=int)
+                        default=1024, type=int)
     parser.add_argument('--w_len', dest='w_len',
                         help='image width',
-                        default=600, type=int)
+                        default=1024, type=int)
     parser.add_argument('--h_overlap', dest='h_overlap',
                         help='height overlap',
-                        default=150, type=int)
+                        default=400, type=int)
     parser.add_argument('--w_overlap', dest='w_overlap',
                         help='width overlap',
-                        default=150, type=int)
+                        default=400, type=int)
     args = parser.parse_args()
     return args
 

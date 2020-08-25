@@ -91,7 +91,7 @@ def worker(gpu_id, images, det_net, result_queue):
                 detected_boxes = forward_convert(detected_boxes, False)
                 detected_boxes[:, 0::2] *= (raw_w / resized_w)
                 detected_boxes[:, 1::2] *= (raw_h / resized_h)
-                detected_boxes = backward_convert(detected_boxes, False)
+                # detected_boxes = backward_convert(detected_boxes, False)
 
                 det_boxes_r_all.extend(detected_boxes)
                 det_scores_r_all.extend(detected_scores)
@@ -115,20 +115,21 @@ def worker(gpu_id, images, det_net, result_queue):
                 tmp_label_r = det_category_r_all[index]
                 tmp_score_r = det_scores_r_all[index]
 
-                tmp_boxes_r = np.array(tmp_boxes_r)
-                tmp = np.zeros([tmp_boxes_r.shape[0], tmp_boxes_r.shape[1] + 1])
-                tmp[:, 0:-1] = tmp_boxes_r
-                tmp[:, -1] = np.array(tmp_score_r)
+                tmp_boxes_r_ = backward_convert(tmp_boxes_r, False)
 
                 try:
-                    inx = nms_rotate.nms_rotate_cpu(boxes=np.array(tmp_boxes_r),
+                    inx = nms_rotate.nms_rotate_cpu(boxes=np.array(tmp_boxes_r_),
                                                     scores=np.array(tmp_score_r),
                                                     iou_threshold=cfgs.NMS_IOU_THRESHOLD,
                                                     max_output_size=500)
                 except:
+                    tmp_boxes_r_ = np.array(tmp_boxes_r_)
+                    tmp = np.zeros([tmp_boxes_r_.shape[0], tmp_boxes_r_.shape[1] + 1])
+                    tmp[:, 0:-1] = tmp_boxes_r_
+                    tmp[:, -1] = np.array(tmp_score_r)
                     # Note: the IoU of two same rectangles is 0, which is calculated by rotate_gpu_nms
-                    jitter = np.zeros([tmp_boxes_r.shape[0], tmp_boxes_r.shape[1] + 1])
-                    jitter[:, 0] += np.random.rand(tmp_boxes_r.shape[0], ) / 1000
+                    jitter = np.zeros([tmp_boxes_r_.shape[0], tmp_boxes_r_.shape[1] + 1])
+                    jitter[:, 0] += np.random.rand(tmp_boxes_r_.shape[0], ) / 1000
                     inx = rotate_gpu_nms(np.array(tmp, np.float32) + np.array(jitter, np.float32),
                                          float(cfgs.NMS_IOU_THRESHOLD), 0)
 
@@ -140,7 +141,7 @@ def worker(gpu_id, images, det_net, result_queue):
             score_res_rotate_ = np.array(score_res_rotate_)
             label_res_rotate_ = np.array(label_res_rotate_)
 
-            result_dict = {'scales': [1, 1], 'boxes': forward_convert(box_res_rotate_, False),
+            result_dict = {'scales': [1, 1], 'boxes': box_res_rotate_,
                            'scores': score_res_rotate_, 'labels': label_res_rotate_,
                            'image_id': a_img}
             result_queue.put_nowait(result_dict)
@@ -194,6 +195,7 @@ def test_icdar2015(det_net, real_test_img_list, gpu_ids, show_box):
                                                                                 labels=res['labels'],
                                                                                 scores=res['scores'],
                                                                                 method=1,
+                                                                                head=np.ones_like(res['scores']) * -1,
                                                                                 in_graph=False)
             cv2.imwrite(draw_path, final_detections)
 
@@ -227,9 +229,9 @@ def eval(num_imgs, test_dir, gpu_ids, show_box):
     else:
         real_test_img_list = test_imgname_list[: num_imgs]
 
-    retinanet = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
-                                                     is_training=False)
-    test_icdar2015(det_net=retinanet, real_test_img_list=real_test_img_list, gpu_ids=gpu_ids, show_box=show_box)
+    csl = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
+                                               is_training=False)
+    test_icdar2015(det_net=csl, real_test_img_list=real_test_img_list, gpu_ids=gpu_ids, show_box=show_box)
 
 
 def parse_args():

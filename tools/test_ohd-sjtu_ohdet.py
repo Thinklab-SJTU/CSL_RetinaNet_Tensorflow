@@ -16,7 +16,7 @@ from multiprocessing import Queue, Process
 sys.path.append("../")
 
 from data.io.image_preprocess import short_side_resize_for_inference_data
-from libs.networks import build_whole_network
+from libs.networks import build_whole_network_ohdet
 from help_utils import tools
 from libs.label_name_dict.label_dict import *
 from libs.box_utils import draw_box_in_img
@@ -42,10 +42,11 @@ def worker(gpu_id, images, det_net, args, result_queue):
 
     img_batch = tf.expand_dims(img_batch, axis=0)
 
-    detection_boxes, detection_scores, detection_category, detection_boxes_angle = det_net.build_whole_detection_network(
+    detection_boxes, detection_scores, detection_category, detection_boxes_head, detection_boxes_angle = det_net.build_whole_detection_network(
         input_img_batch=img_batch,
         gtboxes_batch_h=None,
         gtboxes_batch_r=None,
+        gthead_quadrant=None,
         gt_smooth_label=None)
 
     init_op = tf.group(
@@ -65,11 +66,13 @@ def worker(gpu_id, images, det_net, args, result_queue):
             print('restore model %d ...' % gpu_id)
 
         for img_path in images:
-            # if 'P1925' not in img_path:
+            # if 'P2037' not in img_path:
             #     continue
+
             img = cv2.imread(img_path)
 
             box_res_rotate = []
+            head_res_rotate = []
             label_res_rotate = []
             score_res_rotate = []
 
@@ -110,9 +113,9 @@ def worker(gpu_id, images, det_net, args, result_queue):
                             new_h, new_w = min(int(short_size * float(args.h_len) / args.w_len), max_len), short_size
                         img_resize = cv2.resize(src_img, (new_w, new_h))
 
-                        resized_img, det_boxes_r_, det_scores_r_, det_category_r_ = \
+                        resized_img, det_boxes_r_, det_head_r_, det_scores_r_, det_category_r_ = \
                             sess.run(
-                                [img_batch, detection_boxes_angle, detection_scores, detection_category],
+                                [img_batch, detection_boxes_angle, detection_boxes_head, detection_scores, detection_category],
                                 feed_dict={img_plac: img_resize[:, :, ::-1]}
                             )
 
@@ -130,26 +133,27 @@ def worker(gpu_id, images, det_net, args, result_queue):
                                 box_rotate[0::2] = box_rotate[0::2] + ww_
                                 box_rotate[1::2] = box_rotate[1::2] + hh_
                                 box_res_rotate.append(box_rotate)
+                                head_res_rotate.append(det_head_r_[ii])
                                 label_res_rotate.append(det_category_r_[ii])
                                 score_res_rotate.append(det_scores_r_[ii])
 
             box_res_rotate = np.array(box_res_rotate)
+            head_res_rotate = np.array(head_res_rotate)
             label_res_rotate = np.array(label_res_rotate)
             score_res_rotate = np.array(score_res_rotate)
 
             box_res_rotate_ = []
+            head_res_rotate_ = []
             label_res_rotate_ = []
             score_res_rotate_ = []
-            threshold = {'roundabout': 0.1, 'tennis-court': 0.3, 'swimming-pool': 0.1, 'storage-tank': 0.2,
-                         'soccer-ball-field': 0.3, 'small-vehicle': 0.2, 'ship': 0.2, 'plane': 0.3,
-                         'large-vehicle': 0.1, 'helicopter': 0.2, 'harbor': 0.0001, 'ground-track-field': 0.3,
-                         'bridge': 0.0001, 'basketball-court': 0.3, 'baseball-diamond': 0.3}
+            threshold = {'ship': 0.2, 'airplane': 0.3}
 
             for sub_class in range(1, cfgs.CLASS_NUM + 1):
                 index = np.where(label_res_rotate == sub_class)[0]
                 if len(index) == 0:
                     continue
                 tmp_boxes_r = box_res_rotate[index]
+                tmp_head_r = head_res_rotate[index]
                 tmp_label_r = label_res_rotate[index]
                 tmp_score_r = score_res_rotate[index]
 
@@ -172,17 +176,19 @@ def worker(gpu_id, images, det_net, args, result_queue):
                                          float(threshold[LABEL_NAME_MAP[sub_class]]), 0)
 
                 box_res_rotate_.extend(np.array(tmp_boxes_r)[inx])
+                head_res_rotate_.extend(np.array(tmp_head_r)[inx])
                 score_res_rotate_.extend(np.array(tmp_score_r)[inx])
                 label_res_rotate_.extend(np.array(tmp_label_r)[inx])
 
-            result_dict = {'boxes': np.array(box_res_rotate_), 'scores': np.array(score_res_rotate_),
+            result_dict = {'boxes': np.array(box_res_rotate_), 'heads': np.array(head_res_rotate_),
+                           'scores': np.array(score_res_rotate_),
                            'labels': np.array(label_res_rotate_), 'image_id': img_path}
             result_queue.put_nowait(result_dict)
 
 
-def test_dota(det_net, real_test_img_list, args, txt_name):
+def test_test_ohd_sjtu(det_net, real_test_img_list, args, txt_name):
 
-    save_path = os.path.join('./test_dota', cfgs.VERSION)
+    save_path = os.path.join('./test_test_ohd_sjtu', cfgs.VERSION)
 
     nr_records = len(real_test_img_list)
     pbar = tqdm(total=nr_records)
@@ -207,8 +213,8 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
         if args.show_box:
 
             nake_name = res['image_id'].split('/')[-1]
-            tools.mkdir(os.path.join(save_path, 'dota_img_vis'))
-            draw_path = os.path.join(save_path, 'dota_img_vis', nake_name)
+            tools.mkdir(os.path.join(save_path, 'test_ohd_sjtu_img_vis'))
+            draw_path = os.path.join(save_path, 'test_ohd_sjtu_img_vis', nake_name)
 
             draw_img = np.array(cv2.imread(res['image_id']), np.float32)
             detected_boxes = backward_convert(res['boxes'], with_label=False)
@@ -216,6 +222,7 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
             detected_indices = res['scores'] >= cfgs.VIS_SCORE
             detected_scores = res['scores'][detected_indices]
             detected_boxes = detected_boxes[detected_indices]
+            detected_heads = res['heads'][detected_indices]
             detected_categories = res['labels'][detected_indices]
 
             final_detections = draw_box_in_img.draw_boxes_with_label_and_scores(draw_img,
@@ -223,19 +230,19 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
                                                                                 labels=detected_categories,
                                                                                 scores=detected_scores,
                                                                                 method=1,
-                                                                                head=np.ones_like(detected_scores) * -1,
+                                                                                head=detected_heads,
                                                                                 in_graph=False)
             cv2.imwrite(draw_path, final_detections)
 
         else:
-            CLASS_DOTA = NAME_LABEL_MAP.keys()
+            CLASS_OHD_SJTU = NAME_LABEL_MAP.keys()
             write_handle = {}
 
-            tools.mkdir(os.path.join(save_path, 'dota_res'))
-            for sub_class in CLASS_DOTA:
+            tools.mkdir(os.path.join(save_path, 'test_ohd_sjtu_res'))
+            for sub_class in CLASS_OHD_SJTU:
                 if sub_class == 'back_ground':
                     continue
-                write_handle[sub_class] = open(os.path.join(save_path, 'dota_res', 'Task1_%s.txt' % sub_class), 'a+')
+                write_handle[sub_class] = open(os.path.join(save_path, 'test_ohd_sjtu_res', 'Task1_%s.txt' % sub_class), 'a+')
 
             # rboxes = forward_convert(res['boxes'], with_label=False)
 
@@ -246,7 +253,7 @@ def test_dota(det_net, real_test_img_list, args, txt_name):
                                                                                  rbox[4], rbox[5], rbox[6], rbox[7],)
                 write_handle[LABEL_NAME_MAP[res['labels'][i]]].write(command)
 
-            for sub_class in CLASS_DOTA:
+            for sub_class in CLASS_OHD_SJTU:
                 if sub_class == 'back_ground':
                     continue
                 write_handle[sub_class].close()
@@ -293,9 +300,9 @@ def eval(num_imgs, args):
     else:
         real_test_img_list = test_imgname_list[: num_imgs]
 
-    csl = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
-                                               is_training=False)
-    test_dota(det_net=csl, real_test_img_list=real_test_img_list, args=args, txt_name=txt_name)
+    ohdet = build_whole_network_ohdet.DetectionNetwork(base_network_name=cfgs.NET_NAME,
+                                                       is_training=False)
+    test_test_ohd_sjtu(det_net=ohdet, real_test_img_list=real_test_img_list, args=args, txt_name=txt_name)
 
     if not args.show_box:
         os.remove(txt_name)
@@ -303,11 +310,11 @@ def eval(num_imgs, args):
 
 def parse_args():
 
-    parser = argparse.ArgumentParser('evaluate the result with Pascal2007 strand')
+    parser = argparse.ArgumentParser('evaluate the result with DOTA strand')
 
     parser.add_argument('--test_dir', dest='test_dir',
                         help='evaluate imgs dir ',
-                        default='/data/DOTA/test/images/', type=str)
+                        default='/data/yangxue/dataset/OHD-SJTU/test/images', type=str)
     parser.add_argument('--gpus', dest='gpus',
                         help='gpu id',
                         default='0,1,2,3,4,5,6,7', type=str)
@@ -320,16 +327,16 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--h_len', dest='h_len',
                         help='image height',
-                        default=600, type=int)
+                        default=1024, type=int)
     parser.add_argument('--w_len', dest='w_len',
                         help='image width',
-                        default=600, type=int)
+                        default=1024, type=int)
     parser.add_argument('--h_overlap', dest='h_overlap',
                         help='height overlap',
-                        default=150, type=int)
+                        default=400, type=int)
     parser.add_argument('--w_overlap', dest='w_overlap',
                         help='width overlap',
-                        default=150, type=int)
+                        default=400, type=int)
     args = parser.parse_args()
     return args
 

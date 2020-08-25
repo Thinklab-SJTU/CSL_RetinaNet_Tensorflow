@@ -136,9 +136,9 @@ def eval_with_plac(img_dir, det_net, image_ext, test_annotation_path, draw_imgs=
 
 def eval(img_dir, image_ext, test_annotation_path, draw_imgs):
 
-    retinanet = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
-                                                     is_training=False)
-    all_boxes_r = eval_with_plac(img_dir=img_dir, det_net=retinanet, image_ext=image_ext,
+    csl = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
+                                               is_training=False)
+    all_boxes_r = eval_with_plac(img_dir=img_dir, det_net=csl, image_ext=image_ext,
                                  test_annotation_path=test_annotation_path, draw_imgs=draw_imgs)
 
     # with open(cfgs.VERSION + '_detections_r.pkl', 'rb') as f2:

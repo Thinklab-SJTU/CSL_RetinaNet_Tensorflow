@@ -13,13 +13,14 @@ import time
 sys.path.append("../")
 
 from libs.configs import cfgs
-from libs.networks import build_whole_network
-from data.io.read_tfrecord_multi_gpu import next_batch
+from libs.networks import build_whole_network_ohdet
+from data.io.read_tfrecord_multi_gpu_ohdet import next_batch
 from libs.box_utils.show_box_in_tensor import draw_boxes_with_categories, draw_boxes_with_categories_and_scores
 from help_utils import tools
 from libs.box_utils.coordinate_convert import backward_convert, get_horizen_minAreaRectangle
 from help_utils.smooth_label import angle_smooth_label
 from libs.box_utils.coordinate_convert import coordinate_present_convert
+from help_utils.head_op import get_head, get_head_quadrant
 
 os.environ["CUDA_VISIBLE_DEVICES"] = cfgs.GPU_GROUP
 
@@ -96,9 +97,10 @@ def sum_gradients(tower_grads):
     return sum_grads
 
 
-def get_gtboxes_and_label(gtboxes_and_label_h, gtboxes_and_label_r, num_objects):
+def get_gtboxes_head_and_label(gtboxes_and_label_h, gtboxes_and_label_r, gthead_quadrant, num_objects):
     return gtboxes_and_label_h[:int(num_objects), :].astype(np.float32), \
-           gtboxes_and_label_r[:int(num_objects), :].astype(np.float32)
+           gtboxes_and_label_r[:int(num_objects), :].astype(np.float32), \
+           gthead_quadrant[:int(num_objects), :].astype(np.int32)
 
 
 def warmup_lr(init_lr, global_step, warmup_step, num_gpu):
@@ -130,8 +132,8 @@ def train():
         tf.summary.scalar('lr', lr)
 
         optimizer = tf.train.MomentumOptimizer(lr, momentum=cfgs.MOMENTUM)
-        csl = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME,
-                                                   is_training=True)
+        ohdet = build_whole_network_ohdet.DetectionNetwork(base_network_name=cfgs.NET_NAME,
+                                                           is_training=True)
 
         with tf.name_scope('get_batch'):
 
@@ -155,12 +157,19 @@ def train():
             if cfgs.NET_NAME in ['resnet152_v1d', 'resnet101_v1d', 'resnet50_v1d']:
                 img = img / tf.constant([cfgs.PIXEL_STD])
 
+            gtboxes_and_label, gthead = get_head(gtboxes_and_label_batch[i])
+
             gtboxes_and_label_r = tf.py_func(backward_convert,
-                                             inp=[gtboxes_and_label_batch[i]],
+                                             inp=[gtboxes_and_label],
                                              Tout=tf.float32)
             gtboxes_and_label_r = tf.reshape(gtboxes_and_label_r, [-1, 6])
 
-            gtboxes_and_label_h = get_horizen_minAreaRectangle(gtboxes_and_label_batch[i])
+            gthead_quadrant = tf.py_func(get_head_quadrant,
+                                         inp=[gthead, gtboxes_and_label_r],
+                                         Tout=tf.int32)
+            gthead_quadrant = tf.reshape(gthead_quadrant, [-1, 1])
+
+            gtboxes_and_label_h = get_horizen_minAreaRectangle(gtboxes_and_label)
             gtboxes_and_label_h = tf.reshape(gtboxes_and_label_h, [-1, 5])
 
             num_objects = num_objects_batch[i]
@@ -169,7 +178,7 @@ def train():
             img_h = img_h_batch[i]
             img_w = img_w_batch[i]
 
-            inputs_list.append([img, gtboxes_and_label_h, gtboxes_and_label_r, num_objects, img_h, img_w])
+            inputs_list.append([img, gtboxes_and_label_h, gtboxes_and_label_r, gthead_quadrant, num_objects, img_h, img_w])
 
         tower_grads = []
         biases_regularizer = tf.no_regularizer
@@ -178,6 +187,7 @@ def train():
         total_loss_dict = {
             'cls_loss': tf.constant(0., tf.float32),
             'reg_loss': tf.constant(0., tf.float32),
+            'head_cls_loss': tf.constant(0., tf.float32),
             'angle_cls_loss': tf.constant(0., tf.float32),
             'total_losses': tf.constant(0., tf.float32),
         }
@@ -195,13 +205,16 @@ def train():
                                                 biases_regularizer=biases_regularizer,
                                                 biases_initializer=tf.constant_initializer(0.0)):
 
-                                gtboxes_and_label_h, gtboxes_and_label_r = tf.py_func(get_gtboxes_and_label,
-                                                                                      inp=[inputs_list[i][1],
-                                                                                           inputs_list[i][2],
-                                                                                           inputs_list[i][3]],
-                                                                                      Tout=[tf.float32, tf.float32])
+                                gtboxes_and_label_h, gtboxes_and_label_r, gthead_quadrant = tf.py_func(
+                                    get_gtboxes_head_and_label,
+                                    inp=[inputs_list[i][1],
+                                         inputs_list[i][2],
+                                         inputs_list[i][3],
+                                         inputs_list[i][4]],
+                                    Tout=[tf.float32, tf.float32, tf.int32])
                                 gtboxes_and_label_h = tf.reshape(gtboxes_and_label_h, [-1, 5])
                                 gtboxes_and_label_r = tf.reshape(gtboxes_and_label_r, [-1, 6])
+                                gthead_quadrant = tf.reshape(gthead_quadrant, [-1, 1])
 
                                 if cfgs.ANGLE_RANGE == 180:
                                     gtboxes_and_label_r_ = tf.py_func(coordinate_present_convert,
@@ -229,11 +242,12 @@ def train():
                                                                     target_height=tf.cast(img_shape[0], tf.int32),
                                                                     target_width=tf.cast(img_shape[1], tf.int32))
 
-                                outputs = csl.build_whole_detection_network(input_img_batch=img,
-                                                                            gtboxes_batch_h=gtboxes_and_label_h,
-                                                                            gtboxes_batch_r=gtboxes_and_label_r,
-                                                                            gt_smooth_label=gt_smooth_label,
-                                                                            gpu_id=i)
+                                outputs = ohdet.build_whole_detection_network(input_img_batch=img,
+                                                                              gtboxes_batch_h=gtboxes_and_label_h,
+                                                                              gtboxes_batch_r=gtboxes_and_label_r,
+                                                                              gthead_quadrant=gthead_quadrant,
+                                                                              gt_smooth_label=gt_smooth_label,
+                                                                              gpu_id=i)
                                 gtboxes_in_img_h = draw_boxes_with_categories(img_batch=img,
                                                                               boxes=gtboxes_and_label_h[:, :-1],
                                                                               labels=gtboxes_and_label_h[:, -1],
@@ -241,7 +255,8 @@ def train():
                                 gtboxes_in_img_r = draw_boxes_with_categories(img_batch=img,
                                                                               boxes=gtboxes_and_label_r[:, :-1],
                                                                               labels=gtboxes_and_label_r[:, -1],
-                                                                              method=1)
+                                                                              method=1,
+                                                                              head=gthead_quadrant[:, -1])
 
                                 tf.summary.image('Compare/gtboxes_h_gpu:%d' % i, gtboxes_in_img_h)
                                 tf.summary.image('Compare/gtboxes_r_gpu:%d' % i, gtboxes_in_img_r)
@@ -252,15 +267,17 @@ def train():
                                         boxes=outputs[0],
                                         scores=outputs[1],
                                         labels=outputs[2],
-                                        method=1)
+                                        method=1,
+                                        head=outputs[3])
                                     tf.summary.image('Compare/final_detection_gpu:%d' % i, detections_in_img)
 
                                     detections_angle_in_img = draw_boxes_with_categories_and_scores(
                                         img_batch=img,
-                                        boxes=outputs[3],
+                                        boxes=outputs[4],
                                         scores=outputs[1],
                                         labels=outputs[2],
-                                        method=1)
+                                        method=1,
+                                        head=outputs[3])
                                     tf.summary.image('Compare/final_detection_angle_gpu:%d' % i, detections_angle_in_img)
 
                                 loss_dict = outputs[-1]
@@ -317,7 +334,7 @@ def train():
         # train_op = optimizer.apply_gradients(final_gvs, global_step=global_step)
         summary_op = tf.summary.merge_all()
 
-        restorer, restore_ckpt = csl.get_restorer()
+        restorer, restore_ckpt = ohdet.get_restorer()
         saver = tf.train.Saver(max_to_keep=5)
 
         init_op = tf.group(
