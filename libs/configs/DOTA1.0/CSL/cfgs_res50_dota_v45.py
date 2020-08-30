@@ -10,30 +10,30 @@ gaussian label, omega=10
 
 This is your result for task 1:
 
-    mAP: 0.6646152951988321
-    ap of each class: plane:0.8913767723850412,
-    baseball-diamond:0.7824342787811432,
-    bridge:0.41451628278951164,
-    ground-track-field:0.6188443663208361,
-    small-vehicle:0.6308969363807232,
-    large-vehicle:0.5409427060802551,
-    ship:0.656320806373397,
-    tennis-court:0.9085376681920635,
-    basketball-court:0.7934010277040646,
-    storage-tank:0.7562658557516387,
-    soccer-ball-field:0.5325627310101363,
-    roundabout:0.5894601611841765,
-    harbor:0.5305415436509874,
-    swimming-pool:0.6934177404914867,
-    helicopter:0.6297105508870214
+    mAP: 0.6738304898085752
+    ap of each class: plane:0.8914335719717486,
+    baseball-diamond:0.7825554534383872,
+    bridge:0.42253905536333874,
+    ground-track-field:0.618954473632168,
+    small-vehicle:0.682804572312177,
+    large-vehicle:0.5450885181789469,
+    ship:0.7285446732619127,
+    tennis-court:0.9086060935169401,
+    basketball-court:0.7934179459801323,
+    storage-tank:0.7558745355233758,
+    soccer-ball-field:0.5327609959142836,
+    roundabout:0.5898646648632354,
+    harbor:0.5310054187218879,
+    swimming-pool:0.6949448883695547,
+    helicopter:0.6290624860805408
 
 The submitted information is :
 
 Description: RetinaNet_DOTA_2x_20200729_75.6w
-Username: SJTU-Det
-Institute: SJTU
-Emailadress: yangxue-2019-sjtu@sjtu.edu.cn
-TeamMembers: yangxue
+Username: DetectionTeamCSU
+Institute: CSU
+Emailadress: yangxue@csu.edu.cn
+TeamMembers: YangXue
 
 
 """
