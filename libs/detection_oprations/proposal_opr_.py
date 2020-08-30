@@ -69,7 +69,7 @@ def postprocess_detctions(rpn_bbox_pred, rpn_cls_prob, rpn_angle_prob, anchors, 
         nms_indices = nms_rotate.nms_rotate(decode_boxes=boxes_pred_angle,
                                             scores=scores,
                                             iou_threshold=cfgs.NMS_IOU_THRESHOLD,
-                                            max_output_size=100,
+                                            max_output_size=100 if is_training else 1000,
                                             use_angle_condition=False,
                                             angle_threshold=15,
                                             use_gpu=False)

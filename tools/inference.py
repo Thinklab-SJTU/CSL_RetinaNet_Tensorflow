@@ -82,6 +82,7 @@ def detect(det_net, inference_save_path, real_test_imgname_list):
                                                                                 labels=show_categories,
                                                                                 scores=show_scores,
                                                                                 method=1,
+                                                                                head=np.ones_like(show_scores) * -1,
                                                                                 in_graph=False)
             nake_name = a_img_name.split('/')[-1]
             # print (inference_save_path + '/' + nake_name)

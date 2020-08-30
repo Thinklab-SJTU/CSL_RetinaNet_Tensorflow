@@ -146,7 +146,8 @@ def worker(gpu_id, images, det_net, args, result_queue):
             head_res_rotate_ = []
             label_res_rotate_ = []
             score_res_rotate_ = []
-            threshold = {'ship': 0.2, 'airplane': 0.3}
+            threshold = {'small-vehicle': 0.2, 'ship': 0.2, 'plane': 0.3,
+                         'large-vehicle': 0.1, 'helicopter': 0.2, 'harbor': 0.0001}
 
             for sub_class in range(1, cfgs.CLASS_NUM + 1):
                 index = np.where(label_res_rotate == sub_class)[0]
@@ -327,16 +328,16 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--h_len', dest='h_len',
                         help='image height',
-                        default=1024, type=int)
+                        default=600, type=int)
     parser.add_argument('--w_len', dest='w_len',
                         help='image width',
-                        default=1024, type=int)
+                        default=600, type=int)
     parser.add_argument('--h_overlap', dest='h_overlap',
                         help='height overlap',
-                        default=400, type=int)
+                        default=150, type=int)
     parser.add_argument('--w_overlap', dest='w_overlap',
                         help='width overlap',
-                        default=400, type=int)
+                        default=150, type=int)
     args = parser.parse_args()
     return args
 

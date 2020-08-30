@@ -27,14 +27,13 @@ from libs.box_utils.rotate_polygon_nms import rotate_gpu_nms
 
 def worker(gpu_id, images, det_net, args, result_queue):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    # 1. preprocess img
+
     img_plac = tf.placeholder(dtype=tf.uint8, shape=[None, None, 3])  # is RGB. not BGR
     img_batch = tf.cast(img_plac, tf.float32)
 
-    # img_batch = short_side_resize_for_inference_data(img_tensor=img_batch,
-    #                                                  target_shortside_len=cfgs.IMG_SHORT_SIDE_LEN,
-    #                                                  length_limitation=cfgs.IMG_MAX_LENGTH,
-    #                                                  is_resize=not args.multi_scale)
+    img_batch = short_side_resize_for_inference_data(img_tensor=img_batch,
+                                                     target_shortside_len=cfgs.IMG_SHORT_SIDE_LEN,
+                                                     length_limitation=cfgs.IMG_MAX_LENGTH)
     if cfgs.NET_NAME in ['resnet152_v1d', 'resnet101_v1d', 'resnet50_v1d']:
         img_batch = (img_batch / 255 - tf.constant(cfgs.PIXEL_MEAN_)) / tf.constant(cfgs.PIXEL_STD)
     else:
@@ -65,8 +64,10 @@ def worker(gpu_id, images, det_net, args, result_queue):
             print('restore model %d ...' % gpu_id)
 
         for img_path in images:
-            # if 'P1925' not in img_path:
+
+            # if 'P0016' not in img_path:
             #     continue
+
             img = cv2.imread(img_path)
 
             box_res_rotate = []
@@ -75,8 +76,6 @@ def worker(gpu_id, images, det_net, args, result_queue):
 
             imgH = img.shape[0]
             imgW = img.shape[1]
-
-            img_short_side_len_list = cfgs.IMG_SHORT_SIDE_LEN if args.multi_scale else [cfgs.IMG_SHORT_SIDE_LEN]
 
             if imgH < args.h_len:
                 temp = np.zeros([args.h_len, imgW, 3], np.float32)
@@ -102,36 +101,28 @@ def worker(gpu_id, images, det_net, args, result_queue):
                         ww_ = ww
                     src_img = img[hh_:(hh_ + args.h_len), ww_:(ww_ + args.w_len), :]
 
-                    for short_size in img_short_side_len_list:
-                        max_len = cfgs.IMG_MAX_LENGTH
-                        if args.h_len < args.w_len:
-                            new_h, new_w = short_size, min(int(short_size * float(args.w_len) / args.h_len), max_len)
-                        else:
-                            new_h, new_w = min(int(short_size * float(args.h_len) / args.w_len), max_len), short_size
-                        img_resize = cv2.resize(src_img, (new_w, new_h))
+                    resized_img, det_boxes_r_, det_scores_r_, det_category_r_ = \
+                        sess.run(
+                            [img_batch, detection_boxes_angle, detection_scores, detection_category],
+                            feed_dict={img_plac: src_img[:, :, ::-1]}
+                        )
 
-                        resized_img, det_boxes_r_, det_scores_r_, det_category_r_ = \
-                            sess.run(
-                                [img_batch, detection_boxes_angle, detection_scores, detection_category],
-                                feed_dict={img_plac: img_resize[:, :, ::-1]}
-                            )
+                    resized_h, resized_w = resized_img.shape[1], resized_img.shape[2]
+                    src_h, src_w = src_img.shape[0], src_img.shape[1]
 
-                        resized_h, resized_w = resized_img.shape[1], resized_img.shape[2]
-                        src_h, src_w = src_img.shape[0], src_img.shape[1]
+                    if len(det_boxes_r_) > 0:
+                        det_boxes_r_ = forward_convert(det_boxes_r_, False)
+                        det_boxes_r_[:, 0::2] *= (src_w / resized_w)
+                        det_boxes_r_[:, 1::2] *= (src_h / resized_h)
+                        # det_boxes_r_ = backward_convert(det_boxes_r_, False)
 
-                        if len(det_boxes_r_) > 0:
-                            det_boxes_r_ = forward_convert(det_boxes_r_, False)
-                            det_boxes_r_[:, 0::2] *= (src_w / resized_w)
-                            det_boxes_r_[:, 1::2] *= (src_h / resized_h)
-                            # det_boxes_r_ = backward_convert(det_boxes_r_, False)
-
-                            for ii in range(len(det_boxes_r_)):
-                                box_rotate = det_boxes_r_[ii]
-                                box_rotate[0::2] = box_rotate[0::2] + ww_
-                                box_rotate[1::2] = box_rotate[1::2] + hh_
-                                box_res_rotate.append(box_rotate)
-                                label_res_rotate.append(det_category_r_[ii])
-                                score_res_rotate.append(det_scores_r_[ii])
+                        for ii in range(len(det_boxes_r_)):
+                            box_rotate = det_boxes_r_[ii]
+                            box_rotate[0::2] = box_rotate[0::2] + ww_
+                            box_rotate[1::2] = box_rotate[1::2] + hh_
+                            box_res_rotate.append(box_rotate)
+                            label_res_rotate.append(det_category_r_[ii])
+                            score_res_rotate.append(det_scores_r_[ii])
 
             box_res_rotate = np.array(box_res_rotate)
             label_res_rotate = np.array(label_res_rotate)
@@ -140,7 +131,8 @@ def worker(gpu_id, images, det_net, args, result_queue):
             box_res_rotate_ = []
             label_res_rotate_ = []
             score_res_rotate_ = []
-            threshold = {'ship': 0.2, 'airplane': 0.3}
+            threshold = {'small-vehicle': 0.2, 'ship': 0.2, 'plane': 0.3,
+                         'large-vehicle': 0.1, 'helicopter': 0.2, 'harbor': 0.0001}
 
             for sub_class in range(1, cfgs.CLASS_NUM + 1):
                 index = np.where(label_res_rotate == sub_class)[0]
@@ -156,7 +148,7 @@ def worker(gpu_id, images, det_net, args, result_queue):
                     inx = nms_rotate.nms_rotate_cpu(boxes=np.array(tmp_boxes_r_),
                                                     scores=np.array(tmp_score_r),
                                                     iou_threshold=threshold[LABEL_NAME_MAP[sub_class]],
-                                                    max_output_size=500)
+                                                    max_output_size=5000)
                 except:
                     tmp_boxes_r_ = np.array(tmp_boxes_r_)
                     tmp = np.zeros([tmp_boxes_r_.shape[0], tmp_boxes_r_.shape[1] + 1])
@@ -208,6 +200,7 @@ def test_ohd_sjtu(det_net, real_test_img_list, args, txt_name):
             draw_path = os.path.join(save_path, 'ohd_sjtu_img_vis', nake_name)
 
             draw_img = np.array(cv2.imread(res['image_id']), np.float32)
+
             detected_boxes = backward_convert(res['boxes'], with_label=False)
 
             detected_indices = res['scores'] >= cfgs.VIS_SCORE
@@ -228,13 +221,11 @@ def test_ohd_sjtu(det_net, real_test_img_list, args, txt_name):
             CLASS_OHD_SJTU = NAME_LABEL_MAP.keys()
             write_handle = {}
 
-            tools.mkdir(os.path.join(save_path, 'ohd-sjtu_res'))
+            tools.mkdir(os.path.join(save_path, 'ohd_sjtu_res'))
             for sub_class in CLASS_OHD_SJTU:
                 if sub_class == 'back_ground':
                     continue
-                write_handle[sub_class] = open(os.path.join(save_path, 'ohd-sjtu_res', 'Task1_%s.txt' % sub_class), 'a+')
-
-            # rboxes = forward_convert(res['boxes'], with_label=False)
+                write_handle[sub_class] = open(os.path.join(save_path, 'ohd_sjtu_res', 'Task1_%s.txt' % sub_class), 'a+')
 
             for i, rbox in enumerate(res['boxes']):
                 command = '%s %.3f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f\n' % (res['image_id'].split('/')[-1].split('.')[0],
@@ -313,20 +304,18 @@ def parse_args():
                         default=np.inf, type=int)
     parser.add_argument('--show_box', '-s', default=False,
                         action='store_true')
-    parser.add_argument('--multi_scale', '-ms', default=False,
-                        action='store_true')
     parser.add_argument('--h_len', dest='h_len',
                         help='image height',
-                        default=1024, type=int)
+                        default=600, type=int)
     parser.add_argument('--w_len', dest='w_len',
                         help='image width',
-                        default=1024, type=int)
+                        default=600, type=int)
     parser.add_argument('--h_overlap', dest='h_overlap',
                         help='height overlap',
-                        default=400, type=int)
+                        default=150, type=int)
     parser.add_argument('--w_overlap', dest='w_overlap',
                         help='width overlap',
-                        default=400, type=int)
+                        default=150, type=int)
     args = parser.parse_args()
     return args
 
@@ -339,5 +328,22 @@ if __name__ == '__main__':
     print(20*"--")
     eval(args.eval_num,
          args=args)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
