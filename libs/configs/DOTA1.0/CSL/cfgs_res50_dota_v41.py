@@ -6,29 +6,30 @@ import math
 
 """
 pulse label, omega=1
+
 This is your result for task 1:
 
-mAP: 0.6786341050299889
-ap of each class:
-plane:0.8907464395828899,
-baseball-diamond:0.7920154603744037,
-bridge:0.44861167548910313,
-ground-track-field:0.6797927634696385,
-small-vehicle:0.6222092197709829,
-large-vehicle:0.5585373578560066,
-ship:0.6535020388033018,
-tennis-court:0.9080095145195868,
-basketball-court:0.8049008834364647,
-storage-tank:0.7680155046408351,
-soccer-ball-field:0.5808135669136488,
-roundabout:0.6109797398164146,
-harbor:0.5923814999025173,
-swimming-pool:0.6931413759021513,
-helicopter:0.575854534971891
+    mAP: 0.687302111248375
+    ap of each class:
+    plane:0.8909342530317464,
+    baseball-diamond:0.7922712750998728,
+    bridge:0.45785959546550553,
+    ground-track-field:0.6794415673568659,
+    small-vehicle:0.6658176543655151,
+    large-vehicle:0.5628798425523656,
+    ship:0.7155442805781995,
+    tennis-court:0.9080095714731273,
+    basketball-court:0.8050826610416045,
+    storage-tank:0.766114706284049,
+    soccer-ball-field:0.5852681707570853,
+    roundabout:0.6100481551283217,
+    harbor:0.5992335408254846,
+    swimming-pool:0.6950960106316608,
+    helicopter:0.5759303841342222
 
 The submitted information is :
 
-Description: RetinaNet_DOTA_2x_20200724_70.2w
+Description: RetinaNet_DOTA_2x_20200724_70.2w_
 Username: yangxue
 Institute: DetectionTeamUCAS
 Emailadress: yangxue16@mails.ucas.ac.cn

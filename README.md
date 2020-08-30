@@ -15,8 +15,8 @@ Other CSL-based code: [R<sup>3</sup>Det-CSL](https://github.com/Thinklab-SJTU/R3
 ### DOTA1.0 (Task1)
 | Model |    Backbone    |    Training data    |    Val data    |    mAP   | Model Link | Anchor | Label Mode | Reg. Loss| Angle Range | lr schd | Data Augmentation | GPU | Image/GPU | Configs |      
 |:------------:|:------------:|:------------:|:---------:|:-----------:|:----------:|:-----------:|:-----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|    
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 66.46 | - | H | **Gaussian (r=1, w=10)** | smooth L1 | **180** | 2x | × | 3X GeForce RTX 2080 Ti | 1 | [cfgs_res50_dota_v45.py](./libs/configs/DOTA1.0/CSL/cfgs_res50_dota_v45.py) |
-| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 67.86 | - | H | **Pulse (w=1)** | smooth L1 | **180** | 2x | × | 2X GeForce RTX 2080 Ti | 1 | [cfgs_res50_dota_v41.py](./libs/configs/DOTA1.0/CSL/cfgs_res50_dota_v41.py) |
+| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test |  | - | H | **Gaussian (r=1, w=10)** | smooth L1 | **180** | 2x | × | 3X GeForce RTX 2080 Ti | 1 | [cfgs_res50_dota_v45.py](./libs/configs/DOTA1.0/CSL/cfgs_res50_dota_v45.py) |
+| [CSL](https://arxiv.org/abs/2003.05597) | ResNet50_v1 600->800 | DOTA1.0 trainval | DOTA1.0 test | 68.73 | - | H | **Pulse (w=1)** | smooth L1 | **180** | 2x | × | 2X GeForce RTX 2080 Ti | 1 | [cfgs_res50_dota_v41.py](./libs/configs/DOTA1.0/CSL/cfgs_res50_dota_v41.py) |
 
 ### Visualization
 ![1](demo1.png)
