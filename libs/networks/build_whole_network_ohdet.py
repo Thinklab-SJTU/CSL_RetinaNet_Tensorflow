@@ -12,8 +12,8 @@ from libs.box_utils import anchor_utils, generate_anchors, generate_rotate_ancho
 from libs.configs import cfgs
 from libs.losses import losses
 from libs.box_utils import show_box_in_tensor
-from libs.detection_oprations.proposal_opr_head import postprocess_detctions
-from libs.detection_oprations.anchor_target_layer_without_boxweight_head import anchor_target_layer
+from libs.detection_oprations.proposal_opr_ohdet import postprocess_detctions
+from libs.detection_oprations.anchor_target_layer_without_boxweight_ohdet import anchor_target_layer
 from libs.networks.resnet import add_heatmap
 
 

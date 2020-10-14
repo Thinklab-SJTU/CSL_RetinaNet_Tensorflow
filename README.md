@@ -100,6 +100,13 @@ tensorboard --logdir=.
 
 ![4](scalars.png)
 
+
+## Object Heading Detection
+- [OHD-SJTU]: Download from [here](https://yangxue0827.github.io/OHD-SJTU.html).     
+- [OHDet](https://github.com/SJTU-Thinklab-Det/OHDet_Tensorflow): The blue border in the bounding box represents the predicted head of the object. More detail trfer to [here](https://yangxue0827.github.io/CSL_GCL_OHDet.html).          
+
+![5](ohdet.png)
+
 ## Citation
 
 If this is useful for your research, please consider cite.
@@ -111,6 +118,12 @@ If this is useful for your research, please consider cite.
     journal={European Conference on Computer Vision (ECCV)},
     year={2020}
     organization={Springer}
+}
+
+@article{yang2020on,
+    title={On the Arbitrary-Oriented Object Detection: Classification based Approaches Revisited},
+    author={Yang, Xue and Yan, Junchi and He, Tao},
+    year={2020}
 }
 
 @inproceedings{xia2018dota,
