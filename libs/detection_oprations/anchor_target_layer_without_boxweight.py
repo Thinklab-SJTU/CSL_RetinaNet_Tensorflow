@@ -63,7 +63,7 @@ def anchor_target_layer(gt_boxes_h, gt_boxes_r, gt_smooth_label, anchors, gpu_id
     else:
         # no annotations? then everything is background
         target_boxes = np.zeros((anchors.shape[0], gt_boxes_r.shape[1]))
-        target_smooth_label = np.zeros((anchors.shape[0], 90))
+        target_smooth_label = np.zeros((anchors.shape[0], gt_smooth_label.shape[1]))
 
     if cfgs.METHOD == 'H':
         x_c = (anchors[:, 2] + anchors[:, 0]) / 2
