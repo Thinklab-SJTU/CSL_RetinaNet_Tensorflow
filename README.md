@@ -102,7 +102,7 @@ tensorboard --logdir=.
 
 
 ## Object Heading Detection
-- [OHD-SJTU]: Download from [here](https://yangxue0827.github.io/OHD-SJTU.html).     
+- OHD-SJTU: Download from [here](https://yangxue0827.github.io/OHD-SJTU.html).     
 - [OHDet](https://github.com/SJTU-Thinklab-Det/OHDet_Tensorflow): The blue border in the bounding box represents the predicted head of the object. More detail trfer to [here](https://yangxue0827.github.io/CSL_GCL_OHDet.html).          
 
 ![5](ohdet.png)
