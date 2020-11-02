@@ -3,7 +3,7 @@
 ## Abstract
 This repo is based on [Focal Loss for Dense Object Detection](https://arxiv.org/pdf/1708.02002.pdf), and it is completed by [YangXue](https://yangxue0827.github.io/).
 
-Other CSL-based code: [R<sup>3</sup>Det-CSL](https://github.com/Thinklab-SJTU/R3Det_Tensorflow), [OHDet](https://github.com/SJTU-Thinklab-Det/OHDet_Tensorflow)
+**We also recommend a tensorflow-based [rotation detection benchmark](https://github.com/yangxue0827/RotationDetection), which is led by [YangXue](https://yangxue0827.github.io/).**
 
 ## Pipeline
 ![2](pipeline.png)
@@ -81,7 +81,7 @@ cd $PATH_ROOT/tools
 python multi_gpu_train.py
 ```
 
-## Eval
+## Test
 ```  
 cd $PATH_ROOT/tools
 python test_dota.py --test_dir='/PATH/TO/IMAGES/'  
@@ -89,6 +89,8 @@ python test_dota.py --test_dir='/PATH/TO/IMAGES/'
                     --s (visualization, optional)
                     --ms (multi-scale test, optional)
 ``` 
+
+**Notice: In order to set the breakpoint conveniently, the read and write mode of the file is' a+'. If the model of the same #VERSION needs to be tested again, the original test results need to be deleted.**      
 
 ## Tensorboard
 ```  
