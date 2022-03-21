@@ -3,6 +3,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![arXiv](http://img.shields.io/badge/cs.CV-arXiv%3A2003.05597-B31B1B.svg)](https://arxiv.org/abs/2003.05597v2)
 
+ :rocket::rocket::rocket:	**News:** CSL is supported at [MMRotate](https://github.com/open-mmlab/mmrotate) <img src="https://img.shields.io/github/stars/open-mmlab/mmrotate?style=social" /> :rocket::rocket::rocket:
+
 ## Abstract
 This repo is based on [Focal Loss for Dense Object Detection](https://arxiv.org/pdf/1708.02002.pdf), and it is completed by [YangXue](https://yangxue0827.github.io/).
 
